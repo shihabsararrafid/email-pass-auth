@@ -2,7 +2,7 @@ import right from './giphy.gif';
 import wrong from './wrong.jpg';
 import './App.css';
 import app from './firebase.init';
-import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, getAuth, sendEmailVerification, signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from 'react';
 
 function App() {
@@ -48,17 +48,26 @@ function App() {
       setPassCheck(0);
     }
   }
+  const [verify, setVerify] = useState(0);
   const handleSubmitBtn = (event) => {
+    event.preventDefault();
     createUserWithEmailAndPassword(auth, email, password)
       .then(res => {
         const user = res.user;
         console.log(user);
+        sendEmailVerification(auth.currentUser)
+          .then(() => {
+            //email verification sent
+            setVerify(1);
+          })
       })
       .catch(error => {
         console.error(error);
       })
+
+
     // console.log('Clicked', email, password);
-    event.preventDefault();
+
 
   }
   const [visibility, setVisibity] = useState(0);
@@ -87,6 +96,9 @@ function App() {
   }
   const handleCrossBtnWrong = () => {
     setVisibityWrong(0);
+  }
+  const handleCrossBtnVisibilty = () => {
+    setVerify(0);
   }
   const [registered, setRegistered] = useState(false);
   const handleCheckbox = (event) => {
@@ -154,6 +166,19 @@ function App() {
           </div>
 
           <h1 className='text-4xl text-green-600 font-semibold uppercase text-justify'>SUCCESSfully <br />logged in</h1>
+          <div className='w-[60%]  h-[40%] flex justify-center rounded-full '>
+            <img className='w-[50%] ' src={right} alt="" />
+          </div>
+
+        </div>
+      </div>
+      <div className={`absolute w-[40%] h-[500px]  top-0 left-96 ${verify === 1 ? 'block' : 'hidden'}`}>
+        <div className={` relative h-full w-full bg-[whitesmoke] mx-auto rounded-xl  flex-col border-2 mb-10 mt-10 flex justify-center items-center `}>
+          <div className='absolute  top-0 right-0'>
+            <span onClick={handleCrossBtnVisibilty} className='hover:text-red-500 cursor-pointer text-4xl'>✖</span>
+          </div>
+
+          <h1 className='text-4xl text-green-600 font-semibold uppercase text-justify'>Email Verification sent</h1>
           <div className='w-[60%]  h-[40%] flex justify-center rounded-full '>
             <img className='w-[50%] ' src={right} alt="" />
           </div>
